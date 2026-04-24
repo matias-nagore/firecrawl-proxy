@@ -1,4 +1,3 @@
-// Vercel Serverless Function - Proxy para Firecrawl
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,8 +7,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { url, apiKey } = req.body;
-    if (!url || !apiKey) return res.status(400).json({ error: 'Missing url or apiKey' });
+    const { url } = req.body;
+    if (!url) return res.status(400).json({ error: 'Missing url' });
+
+    const apiKey = process.env.FIRECRAWL_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'Firecrawl key not configured on server' });
 
     const firecrawlResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
       method: 'POST',
